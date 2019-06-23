@@ -5,20 +5,6 @@ import {Login} from "./views/Login/Login";
 import {CustomBrowserRouter} from "./CustomBrowserRouter";
 import {Home} from "./views/Home/Home";
 
-function Test() {
-
-    const [v,setV] = React.useState(1)
-
-    React.useEffect(()=>{
-        console.log(v)
-        setV(2)
-        console.log(v)
-    },[])
-
-    return(
-        <div>{}</div>
-    )
-}
 function App() {
     return (
         <>
@@ -30,7 +16,6 @@ function App() {
                     <Route component={() => <h1>404 Not Found</h1>}/>
                 </Switch>
             </CustomBrowserRouter>
-
         </>
     );
 }
