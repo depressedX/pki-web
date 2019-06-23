@@ -39,10 +39,11 @@ storiesOf('登录日志', module)
 storiesOf('设备信息', module)
     .add('default', () => <DeviceBox/>)
 
-storiesOf('合同列表', module)
-    .add('default', () => <ContractBox/>)
 storiesOf('验证模块（多为弹窗）', module)
     .add('default', () => <AuthBox/>)
+
+storiesOf('合同列表', module)
+    .add('default', () => <ContractBox/>)
 
 storiesOf('合同Item', module)
     .add('文件图标', () => (

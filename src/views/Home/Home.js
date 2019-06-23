@@ -6,6 +6,8 @@ import {ContractBox} from "./components/Contract/ContractBox";
 import Divider from "antd/lib/divider";
 import {DeviceBox} from "./components/Device/DeviceBox";
 import {LogBox} from "./components/Log/LogBox";
+import Card from "antd/lib/card";
+import {NewContractDrawer} from "./components/Contract/NewContractDrawer";
 
 export function Home() {
 
@@ -20,6 +22,7 @@ export function Home() {
 
     const [showDeviceBox, setShowDeviceBox] = React.useState(false)
     const [showLogBox, setShowLogBox] = React.useState(false)
+    const [showNewContractDrawer, setShowNewContractDrawer] = React.useState(false)
 
     return (
         <div className={style.Home}>
@@ -32,8 +35,10 @@ export function Home() {
             <Button type={"link"} onClick={() => setShowDeviceBox(true)}>设备信息</Button>
             <Button type={"link"} onClick={() => setShowLogBox(true)}>登录日志</Button>
             <Divider/>
-            <Title level={2}>合同</Title>
-
+            <Card title="合同" bordered={false}
+                  extra={<Button type={"primary"} onClick={() => setShowNewContractDrawer(true)}>点击创建新合同</Button>}>
+                <ContractBox/>
+            </Card>
 
             <Drawer
                 title="设备信息"
@@ -49,7 +54,7 @@ export function Home() {
                 visible={showLogBox}>
                 <LogBox/>
             </Drawer>
-            <ContractBox/>
+            <NewContractDrawer onClose={() => setShowNewContractDrawer(false)} visible={showNewContractDrawer}/>
         </div>
     )
 }

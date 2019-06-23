@@ -64,7 +64,7 @@ export const contract = {
         })
 
         // return http.get('auth_code')
-        return []
+        // return []
         return [
             {
                 type: ContractItem.status.STATUS_TO_BE_CONFIRMED,
@@ -125,6 +125,12 @@ export const contract = {
     },
 
     async accept(id) {
+        await new Promise(resolve => {
+            setTimeout(() => resolve(), 1000)
+        })
+        return true
+    },
+    async create(form) {
         await new Promise(resolve => {
             setTimeout(() => resolve(), 1000)
         })
