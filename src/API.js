@@ -1,6 +1,7 @@
 import axios from 'axios'
 import {ContractItem} from "./views/Home/components/Contract/ContractItem";
 
+export const WS_AUTH_URL = 'ws://192.168.137.1:8082/hi/auth'
 const http = axios.create({
     baseURL: '/hi/',
     timeout: 2000

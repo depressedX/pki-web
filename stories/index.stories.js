@@ -11,6 +11,7 @@ import {ContractItem} from "../src/views/Home/components/Contract/ContractItem";
 import {LogBox} from "../src/views/Home/components/Log/LogBox";
 import {DeviceBox} from "../src/views/Home/components/Device/DeviceBox";
 import {Home} from "../src/views/Home/Home";
+import {AuthBox} from "../src/views/Home/components/PKIAuth/AuthBox";
 
 function Test() {
 
@@ -40,6 +41,8 @@ storiesOf('设备信息', module)
 
 storiesOf('合同列表', module)
     .add('default', () => <ContractBox/>)
+storiesOf('验证模块（多为弹窗）', module)
+    .add('default', () => <AuthBox/>)
 
 storiesOf('合同Item', module)
     .add('文件图标', () => (

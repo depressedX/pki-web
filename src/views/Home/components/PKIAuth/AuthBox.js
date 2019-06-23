@@ -1,13 +1,9 @@
 import React from 'react'
-import QRCode from 'qrcode'
-import style from './Login.module.scss'
+import style from './AuthBox.module.scss'
 import Spin from "antd/lib/spin";
 import Icon from "antd/lib/icon";
-import {authorization, WS_AUTH_URL} from "../../API";
-import {useRouter} from "../../CustomBrowserRouter";
-import {message} from 'antd'
-import {useQRCode} from "../../customHooks";
-
+import {authorization, WS_AUTH_URL} from "../../../../API";
+import {useQRCode} from "../../../../customHooks";
 
 // 从服务器获取认证码并通过websocket监控其状态
 // 结果是认证信息
@@ -126,35 +122,20 @@ export function useAuthorizationCode() {
     return [code, curCodeState, refresh, authInfo]
 }
 
-function LoginBox() {
-
-
-    // 1.为body添加class 2.修改标题
-    React.useEffect(() => {
-        document.body.classList.add('loginBody')
-        document.title = '登录'
-        return () => {
-            document.body.classList.remove('loginBody')
-        }
-    }, [])
+export function AuthBox({onAuthOK}) {
 
     const [code, curCodeState, refresh, authInfo] = useAuthorizationCode()
     const codeSrc = useQRCode(code)
 
-    const router = useRouter()
-
     // 检测auth信息
     React.useEffect(() => {
         if (!authInfo) return
-        message.success('登陆成功！正在跳转')
-        setTimeout(() => {
+        onAuthOK(authInfo)
 
-            router.history.replace('/home')
-        }, 1000)
     }, [authInfo])
 
     return (
-        <div className={style.loginBox}>
+        <div className={style.authBox}>
             <div className={style.qrCodeContainer}>
                 {/*加载中图标*/}
                 {(curCodeState.loading || curCodeState.null) &&
@@ -171,21 +152,12 @@ function LoginBox() {
                 </div>
                 }
             </div>
-            <div className={style.loginHint}>
+            <div className={style.authHint}>
                 {!curCodeState.expired && <>
-                    <p className={style.subTitle}>使用手机APP扫码登录</p>
-                    <p className={style.subDesc}>网页版应用需要配合手机使用</p>
+                    <p className={style.subTitle}>使用手机APP扫码验证</p>
                 </>}
                 {curCodeState.expired && <p className={style.refreshTips}>二维码失效，点击刷新</p>}
             </div>
         </div>
-    )
-}
-
-export function Login() {
-    return (
-        <>
-            <LoginBox/>
-        </>
     )
 }

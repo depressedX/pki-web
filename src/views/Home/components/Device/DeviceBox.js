@@ -31,7 +31,7 @@ export function DeviceBox() {
     const [list, loading, refresh] = useDeviceList()
 
     return (<>
-        <Button type={"link"} onClick={refresh}>刷新列表</Button>
+        <Button type={"link"} onClick={refresh} disabled={loading}>刷新列表</Button>
         <List
             className="demo-loadmore-list"
             loading={loading}
