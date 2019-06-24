@@ -13,22 +13,26 @@ import {DeviceBox} from "../src/views/Home/components/Device/DeviceBox";
 import {Home} from "../src/views/Home/Home";
 import {AuthBox} from "../src/views/Home/components/PKIAuth/AuthBox";
 
-function Test() {
+function Test(props) {
 
-    const [v, setV] = React.useState(1)
-
-    const prev = usePrevious(v)
+    const [v, setV] = React.useState([1,3,5,7,9])
 
     return (
         <>
-            <button onClick={() => setV(prev => prev + 1)}>click</button>
-            <div>{v} {prev}</div>
+            <button onClick={() => {
+
+                setV([...v.slice(0,2),...v.slice(3)])
+                console.log(Object.getOwnPropertyDescriptor(props,'propA'))
+                props.propA = 333
+                console.log(Object.getOwnPropertyDescriptor(props,'propA'))
+            }}>click</button>
+            <div>{v}{props.propA}</div>
         </>
     )
 }
 
 storiesOf('Test', module)
-    .add('with text', () => <Test/>)
+    .add('with text', () => <Test propA={23}/>)
 
 storiesOf('Home', module)
     .add('with text', () => <Home/>)
@@ -148,7 +152,7 @@ storiesOf('合同Item', module)
                 title: '二手房买卖合同2018',
                 file: {
                     filename: 'test.pdf',
-                    link: process.env.PUBLIC_URL + '/tes.pdf',
+                    link: process.env.PUBLIC_URL + '/test.pdf',
                     size: 128
                 },
                 lastModified: Date.now()
@@ -163,7 +167,7 @@ storiesOf('合同Item', module)
                 title: '二手房买卖合同2018',
                 file: {
                     filename: 'test.pdf',
-                    link: process.env.PUBLIC_URL + '/tes.pdf',
+                    link: process.env.PUBLIC_URL + '/test.pdf',
                     size: 128
                 },
                 lastModified: Date.now()
@@ -178,7 +182,7 @@ storiesOf('合同Item', module)
                 title: '二手房买卖合同2018',
                 file: {
                     filename: 'test.pdf',
-                    link: process.env.PUBLIC_URL + '/tes.pdf',
+                    link: process.env.PUBLIC_URL + '/test.pdf',
                     size: 128
                 },
                 lastModified: Date.now()
@@ -193,7 +197,7 @@ storiesOf('合同Item', module)
                 title: '二手房买卖合同2018',
                 file: {
                     filename: 'test.pdf',
-                    link: process.env.PUBLIC_URL + '/tes.pdf',
+                    link: process.env.PUBLIC_URL + '/test.pdf',
                     size: 128
                 },
                 lastModified: Date.now()
@@ -208,7 +212,7 @@ storiesOf('合同Item', module)
                 title: '二手房买卖合同2018',
                 file: {
                     filename: 'test.pdf',
-                    link: process.env.PUBLIC_URL + '/tes.pdf',
+                    link: process.env.PUBLIC_URL + '/test.pdf',
                     size: 128
                 },
                 lastModified: Date.now()

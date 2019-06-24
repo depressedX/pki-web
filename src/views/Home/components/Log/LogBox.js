@@ -70,7 +70,7 @@ export function LogBox() {
                                         require('../../../../assets/mobile.png')}
                                             shape={"square"}/>
                                 }
-                                title={logItem.deviceName}
+                                title={logItem.deviceModel}
                                 description={`${dateFormat(new Date(logItem.timestamp), 'mm-dd HH:MM')} 
                                 ${logItem.deviceId}`}
                             />

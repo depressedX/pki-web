@@ -45,7 +45,7 @@ export function DeviceBox() {
                                 require('../../../../assets/mobile.png') :
                                 require('../../../../assets/PC.png')}/>
                         }
-                        title={<Text strong>{item.deviceName}</Text>}
+                        title={<Text strong>{item.deviceModel}</Text>}
                         description={item.deviceId}
                     />
                 </List.Item>

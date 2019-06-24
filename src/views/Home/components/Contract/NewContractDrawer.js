@@ -1,6 +1,7 @@
 import React from 'react'
 import {Button, Col, Drawer, Form, Icon, Input, Row, Upload, message} from "antd";
 import {contract} from "../../../../API";
+import {instanceOf} from "prop-types";
 
 const ContractCreateFrom = Form.create({name: 'form_in_modal'})(
     class extends React.Component {
@@ -46,7 +47,7 @@ const ContractCreateFrom = Form.create({name: 'form_in_modal'})(
         }
     })
 
-export function NewContractDrawer({onClose, visible}) {
+export function NewContractDrawer({onClose, visible, onCreate}) {
 
     let formRef = React.useRef(null)
 
@@ -74,10 +75,8 @@ export function NewContractDrawer({onClose, visible}) {
                 await contract.create(formData)
                 form.resetFields();
                 message.success('创建成功')
-                setTimeout(() => {
-                    onClose()
-                }, 1000)
-
+                onClose()
+                typeof onCreate === "function" && onCreate()
             } finally {
                 setSubmitting(false)
             }

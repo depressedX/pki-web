@@ -72,7 +72,7 @@ export const contract = {
                 title: '二手房买卖合同2018',
                 file: {
                     filename: 'test.pdf',
-                    link: process.env.PUBLIC_URL + '/tes.pdf',
+                    link: process.env.PUBLIC_URL + '/test.pdf',
                     size: 128
                 },
                 lastModified: Date.now()
@@ -83,7 +83,7 @@ export const contract = {
                 title: '二手房买卖合同2018',
                 file: {
                     filename: 'test.txt',
-                    link: process.env.PUBLIC_URL + '/tes.pdf',
+                    link: process.env.PUBLIC_URL + '/test.pdf',
                     size: 128
                 },
                 lastModified: Date.now()
@@ -94,7 +94,7 @@ export const contract = {
                 title: '二手房买卖合同2018',
                 file: {
                     filename: 'test.pdf',
-                    link: process.env.PUBLIC_URL + '/tes.pdf',
+                    link: process.env.PUBLIC_URL + '/test.pdf',
                     size: 128
                 },
                 lastModified: Date.now()
@@ -105,7 +105,7 @@ export const contract = {
                 title: '二手房买卖合同2018',
                 file: {
                     filename: 'test.doc',
-                    link: process.env.PUBLIC_URL + '/tes.pdf',
+                    link: process.env.PUBLIC_URL + '/test.pdf',
                     size: 128
                 },
                 lastModified: Date.now()
@@ -116,12 +116,29 @@ export const contract = {
                 title: '二手房买卖合同2018',
                 file: {
                     filename: 'test.pdf',
-                    link: process.env.PUBLIC_URL + '/tes.pdf',
+                    link: process.env.PUBLIC_URL + '/test.pdf',
                     size: 128
                 },
                 lastModified: Date.now()
             },
         ]
+    },
+
+    async getById(contractId) {
+        await new Promise(resolve => {
+            setTimeout(() => resolve(), 1000)
+        })
+
+        return {
+            type: ContractItem.status.STATUS_TO_BE_CONFIRMED,
+            title: '二手房买卖合同2018',
+            file: {
+                filename: 'test.pdf',
+                link: process.env.PUBLIC_URL + '/test.pdf',
+                size: 128
+            },
+            lastModified: Date.now()
+        }
     },
 
     async accept(id) {
@@ -169,22 +186,22 @@ export async function getLogList() {
     // return []
     return [
         {
-            timestamp:Date.now(),
-            deviceId:'SDFSDXV-345',
-            deviceName:'iPhoneX',
-            deviceType:'mobile'
+            timestamp: Date.now(),
+            deviceId: 'SDFSDXV-345',
+            deviceModel: 'iPhoneX',
+            deviceType: 'mobile'
         },
         {
-            timestamp:Date.now(),
-            deviceId:'KNIDFD-345',
-            deviceName:'Lenovo T7',
-            deviceType:'desktop'
+            timestamp: Date.now(),
+            deviceId: 'KNIDFD-345',
+            deviceModel: 'Lenovo T7',
+            deviceType: 'desktop'
         },
         {
-            timestamp:Date.now(),
-            deviceId:'SDFSDXV-345',
-            deviceName:'iPhoneX',
-            deviceType:'mobile'
+            timestamp: Date.now(),
+            deviceId: 'SDFSDXV-345',
+            deviceModel: 'iPhoneX',
+            deviceType: 'mobile'
         },
     ]
 }
@@ -199,19 +216,19 @@ export async function getDeviceList() {
     // return []
     return [
         {
-            deviceId:'SDFSDXV-345',
-            deviceName:'iPhoneX',
-            deviceType:'mobile'
+            deviceId: 'SDFSDXV-345',
+            deviceModel: 'iPhoneX',
+            deviceType: 'mobile'
         },
         {
-            deviceId:'KNIDFD-345',
-            deviceName:'Lenovo T7',
-            deviceType:'desktop'
+            deviceId: 'KNIDFD-345',
+            deviceModel: 'Lenovo T7',
+            deviceType: 'desktop'
         },
         {
-            deviceId:'SDFSDXV-345',
-            deviceName:'iPhoneX',
-            deviceType:'mobile'
+            deviceId: 'SDFSDXV-345',
+            deviceModel: 'iPhoneX',
+            deviceType: 'mobile'
         },
     ]
 }

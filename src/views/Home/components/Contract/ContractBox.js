@@ -2,35 +2,15 @@ import React from 'react'
 import style from './ContractBox.module.scss'
 import {Button, List} from "antd";
 import {ContractItem} from "./ContractItem";
-import {contract} from "../../../../API";
 import Empty from "antd/lib/empty";
+import {NewContractDrawer} from "./NewContractDrawer";
 
-function useContractList() {
-    const contractReducer = contract => contract
-    const [list, setList] = React.useState([])
-    const [loading, setLoading] = React.useState(false)
-    React.useEffect(() => {
-        refresh()
-    }, [])
 
-    async function refresh() {
-        setLoading(true)
-        try {
-            const data = await contract.getList()
-            setList(data.map(contractReducer))
-        } finally {
-            setLoading(false)
-        }
-    }
+export function ContractBox({contractListHook}) {
 
-    return [list, loading, refresh]
-}
+    const [list, loading, {refresh, removeOne}] = contractListHook
 
-export function ContractBox() {
-
-    const [list, loading, refresh] = useContractList()
-
-    const loadMore = !loading?(
+    const loadMore = !loading ? (
         <div
             style={{
                 textAlign: 'center',
@@ -41,7 +21,9 @@ export function ContractBox() {
         >
             <Button>loading more</Button>
         </div>
-    ):null
+    ) : null
+
+    const [showContractCreateDrawer,setShowContractCreateDrawer] =React.useState(false)
 
     return (
         <section className={style.contractBox}>
@@ -65,8 +47,10 @@ export function ContractBox() {
                     loading={loading}
                     itemLayout="horizontal"
                     dataSource={list}
-                    renderItem={props => (<ContractItem {...props}/>)}
-                />}
+                    renderItem={(props, index) => (<ContractItem {...props} onRemove={() => removeOne(index)}/>)}
+                />
+            }
+            <NewContractDrawer onCreate={refresh} onClose={()=>setShowContractCreateDrawer(false)} visible={showContractCreateDrawer}/>
 
         </section>
     )

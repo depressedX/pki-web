@@ -8,6 +8,7 @@ import {DeviceBox} from "./components/Device/DeviceBox";
 import {LogBox} from "./components/Log/LogBox";
 import Card from "antd/lib/card";
 import {NewContractDrawer} from "./components/Contract/NewContractDrawer";
+import {useContractList} from "../../customHooks";
 
 export function Home() {
 
@@ -24,6 +25,9 @@ export function Home() {
     const [showLogBox, setShowLogBox] = React.useState(false)
     const [showNewContractDrawer, setShowNewContractDrawer] = React.useState(false)
 
+    const contractListHook = useContractList()
+    const [, , contractListHookActions] = contractListHook
+
     return (
         <div className={style.Home}>
 
@@ -37,7 +41,7 @@ export function Home() {
             <Divider/>
             <Card title="合同" bordered={false}
                   extra={<Button type={"primary"} onClick={() => setShowNewContractDrawer(true)}>点击创建新合同</Button>}>
-                <ContractBox/>
+                <ContractBox contractListHook={contractListHook}/>
             </Card>
 
             <Drawer
@@ -54,7 +58,9 @@ export function Home() {
                 visible={showLogBox}>
                 <LogBox/>
             </Drawer>
-            <NewContractDrawer onClose={() => setShowNewContractDrawer(false)} visible={showNewContractDrawer}/>
+            <NewContractDrawer onCreate={() => contractListHookActions.refresh()}
+                               onClose={() => setShowNewContractDrawer(false)}
+                               visible={showNewContractDrawer}/>
         </div>
     )
 }

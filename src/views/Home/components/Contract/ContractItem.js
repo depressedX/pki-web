@@ -1,22 +1,14 @@
 import React from "react";
-import {contract, getUserInfo} from "../../../../API";
+import {contract} from "../../../../API";
 import {fileType, getExtension} from "../../../../util";
-import {Avatar, Button, Icon, List, Popconfirm, Tooltip, message} from "antd";
-import {usePrevious} from "../../../../customHooks";
+import {Avatar, Button, Icon, List, Popconfirm, Tooltip, message, Skeleton} from "antd";
+import {usePrevious, useUserInfo} from "../../../../customHooks";
 import Upload from "antd/lib/upload";
 import Text from "antd/lib/typography/Text";
 import Types from "prop-types";
 import './ContractItem.scss'
+import formatDate from 'dateformat'
 
-function useUserInfo(uid) {
-    const [userInfo, setUserInfo] = React.useState({})
-    React.useEffect(() => {
-        getUserInfo(uid).then(data => {
-            setUserInfo(data)
-        })
-    }, [uid])
-    return userInfo
-}
 
 function genFileIcon(filename) {
     const ext = getExtension(filename)
@@ -34,13 +26,14 @@ function genFileIcon(filename) {
 
 }
 
-function AcceptButton(contrastId) {
+function AcceptButton({contrastId,onRefresh}) {
     const [loading, setLoading] = React.useState(false)
 
     async function clickFunc() {
         setLoading(true)
         try {
             await contract.accept(contrastId)
+            onRefresh()
         } finally {
             setLoading(false)
         }
@@ -49,12 +42,12 @@ function AcceptButton(contrastId) {
     return <Button type={"primary"} onClick={clickFunc} loading={loading}>接受</Button>
 }
 
-function ModifyButton({contrastId}) {
+function ModifyButton({contrastId, onRefresh}) {
     const [fileList, setFileList] = React.useState([])
     const [uploading, setUploading] = React.useState(false)
     const props = {
         name: 'file',
-        action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+        action: `https://www.mocky.io/v2/5cc8019d300000980a055e76?id=${contrastId}`,
         headers: {
             authorization: 'authorization-text',
         },
@@ -64,6 +57,7 @@ function ModifyButton({contrastId}) {
             }
             if (info.file.status === 'done') {
                 setUploading(false)
+                onRefresh()
             } else if (info.file.status === 'error') {
                 setUploading(false)
             }
@@ -104,10 +98,11 @@ function ModifyButton({contrastId}) {
     </Upload>
 }
 
-function DeclineButton({contrastId}) {
+function DeclineButton({contrastId, onDecline}) {
     function confirmFunc() {
         contract.decline(contrastId).then(() => {
             message.success('已回绝')
+            onDecline()
         })
     }
 
@@ -122,92 +117,111 @@ function DeclineButton({contrastId}) {
 
 const itemStatus = {
 // 待确认
-    STATUS_TO_BE_CONFIRMED: 0,
+    STATUS_TO_BE_CONFIRMED: 1,
 // 有修改且待对方确认
-    STATUS_OTHER_TO_BE_CONFIRMED: 1,
+    STATUS_OTHER_TO_BE_CONFIRMED: 2,
 // 已确认且对方也已确认
-    STATUS_ALL_CONFIRMED: 2,
+    STATUS_ALL_CONFIRMED: 3,
 // 已签名且待对方签名
-    STATUS_OTHER_TO_BE_SIGNED: 3,
+    STATUS_OTHER_TO_BE_SIGNED: 4,
 // 已签名且对方也已签名
-    STATUS_ALL_SIGNED: 4,
+    STATUS_ALL_SIGNED: 5,
 }
 
 export function ContractItem(props) {
 
-    const {type, id, title, lastModified, file: {filename, size, link}, partA, partB} = props
+    let {type, id, title, lastModified, file: {filename, size, link}, partA, partB} = props
+    const {onRemove} = props
+
+    const [loading,setLoading] = React.useState(false)
+
+    async function onRefresh() {
+        setLoading(true)
+        try {
+            ({type, id, title, lastModified, file: {filename, size, link}, partA, partB} =
+                await contract.getById(id))
+
+        } catch (e) {
+            message.error(`获取失败，code${e.status}:${e.message}`)
+        }finally {
+            setLoading(false)
+        }
+    }
 
     const {username: partAName} = useUserInfo(partA)
     const {username: partBName} = useUserInfo(partB)
     // 下载原合同按钮
     const downloadButton = <Button href={link} type={"link"}>下载</Button>
     // 接受合同
-    const acceptButton = <AcceptButton contrastId={id}/>
+    const acceptButton = <AcceptButton contrastId={id} onRefresh={onRefresh}/>
     // 等待对方确认
     const otherAcceptButton = <Button type={"primary"} disabled>等待对方确认</Button>
     // 拒绝合同
-    const declineButton = <DeclineButton contrastId={id}/>
+    const declineButton = <DeclineButton onDecline={onRemove} contrastId={id}/>
     // 修改合同
-    const modifyButton = <ModifyButton contrastId={id}/>
+    const modifyButton = <ModifyButton contrastId={id} onRefresh={onRefresh}/>
     // 签名
     const signButton = <Button type={"primary"}>签名</Button>
     // 等待对方签名
-    const othersSgnButton = <Button type={"primary"}>签名</Button>
+    const othersSgnButton = <Button type={"primary"} disabled>等待对方签名</Button>
     // 下载证书
     const downloadCredentialButton = <Button href={link} type={"link"}>下载签名版合同</Button>
     // 校验本地文件
     const verifyLocalCredential = <Button href={link} type={"link"}>校验本地文件</Button>
 
-    let actionButtons = null
-    switch (type) {
-        case itemStatus.STATUS_TO_BE_CONFIRMED: {
-            actionButtons = [downloadButton, acceptButton, modifyButton, declineButton]
-            break
-        }
-        case itemStatus.STATUS_OTHER_TO_BE_CONFIRMED: {
-            actionButtons = [downloadButton, otherAcceptButton, modifyButton]
-            break
-        }
-        case itemStatus.STATUS_ALL_CONFIRMED: {
-            actionButtons = [downloadButton, signButton]
-            break
-        }
-        case itemStatus.STATUS_OTHER_TO_BE_SIGNED: {
-            actionButtons = [downloadButton, othersSgnButton]
-            break
-        }
-        case itemStatus.STATUS_ALL_SIGNED: {
-            actionButtons = [downloadButton, downloadCredentialButton, verifyLocalCredential]
-            break
-        }
-        default: {
-            throw new Error(`unknown item type:${type} ${JSON.stringify(itemStatus)}`)
+    // 将组件状态映射为actionButtons
+    let mapItemStatusToActionButtons = status => {
+        switch (status) {
+            case itemStatus.STATUS_TO_BE_CONFIRMED: {
+                return [downloadButton, acceptButton, modifyButton, declineButton]
+            }
+            case itemStatus.STATUS_OTHER_TO_BE_CONFIRMED: {
+                return [downloadButton, otherAcceptButton, modifyButton]
+            }
+            case itemStatus.STATUS_ALL_CONFIRMED: {
+                return [downloadButton, signButton]
+            }
+            case itemStatus.STATUS_OTHER_TO_BE_SIGNED: {
+                return [downloadButton, othersSgnButton]
+            }
+            case itemStatus.STATUS_ALL_SIGNED: {
+                return [downloadButton, downloadCredentialButton, verifyLocalCredential]
+            }
+            default: {
+                throw new Error(`unknown item type:${type} ${JSON.stringify(itemStatus)}`)
+            }
         }
     }
+
+    let actionButtons = mapItemStatusToActionButtons(type)
 
 
     let ItemIcon = type === itemStatus.STATUS_ALL_SIGNED ?
         <Avatar icon={"check"} style={{color: '#f6ffed', backgroundColor: '#52c41a'}}/> : genFileIcon(filename)
 
-    const date = new Date(lastModified)
+    const lastModifiedFormatted = formatDate(new Date(lastModified), 'yyyy mm-dd-HH:MM')
 
-    return <List.Item actions={actionButtons} className={"contractItem"}>
-        <List.Item.Meta
-            avatar={ItemIcon}
-            title={<a href={link} target={'_blank'}>{type === itemStatus.STATUS_ALL_SIGNED && '(已成功签订)'}{title}</a>}
-            description={`${filename} | ${size}KB | 最后修改：${date.getFullYear()} ${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`}
-        />
-        <Text style={{flex:"none",textAlign:"center",padding:'0 1em'}}>甲方：
-            <Tooltip placement="bottom" title={<span>3705231998000021250</span>}>
-                <Text strong>{partAName || <Icon type="loading" spin/>}</Text>
-            </Tooltip>
-        </Text>
-        <Text style={{flex:"none",textAlign:"center",padding:'0 1em'}}>乙方：
-            <Tooltip placement="bottom" title={<span>370523199800003355</span>}>
-                <Text strong>{partBName || <Icon type="loading" spin/>}</Text>
-            </Tooltip>
-        </Text>
-    </List.Item>
+    return (
+        <List.Item actions={actionButtons} className={"contractItem"}>
+            <Skeleton avatar={{size:32}} title={false} paragraph={{width:[120,240]}} loading={loading} active>
+                <List.Item.Meta
+                    avatar={ItemIcon}
+                    title={<a href={link}
+                              target={'_blank'}>{type === itemStatus.STATUS_ALL_SIGNED && '(已成功签订)'}{title}</a>}
+                    description={`${filename} | ${size}KB | 最后修改：${lastModifiedFormatted}`}
+                />
+                <Text style={{flex: "none", textAlign: "center", padding: '0 1em'}}>甲方：
+                    <Tooltip placement="bottom" title={<span>3705231998000021250</span>}>
+                        <Text strong>{partAName || <Icon type="loading" spin/>}</Text>
+                    </Tooltip>
+                </Text>
+                <Text style={{flex: "none", textAlign: "center", padding: '0 1em'}}>乙方：
+                    <Tooltip placement="bottom" title={<span>370523199800003355</span>}>
+                        <Text strong>{partBName || <Icon type="loading" spin/>}</Text>
+                    </Tooltip>
+                </Text>
+            </Skeleton>
+        </List.Item>)
 }
 
 ContractItem.status = itemStatus
@@ -222,5 +236,6 @@ ContractItem.propTypes = {
         link: Types.string
     }),
     partA: Types.number,
-    partB: Types.number
+    partB: Types.number,
+    onRemove: Types.func
 }
