@@ -204,7 +204,7 @@ export function ContractItem(props) {
 
     const [signCodeModalVisible, setSignCodeModalVisible] = React.useState(false)
 
-    function onFinishSigning(){
+    function onFinishSigning() {
         setSignCodeModalVisible(false)
         onRefresh()
     }
@@ -219,16 +219,18 @@ export function ContractItem(props) {
                                   target={'_blank'}>{type === itemStatus.STATUS_ALL_SIGNED && '(已成功签订)'}{title}</a>}
                         description={`${filename} | ${size}KB | 最后修改：${lastModifiedFormatted}`}
                     />
-                    <div style={{flex:'auto'}}><Text style={{textAlign: "center", padding: '0 1em'}}>甲方：
-                        <Tooltip placement="bottom" title={<span>3705231998000021250</span>}>
-                            <Text strong>{partAName || <Icon type="loading" spin/>}</Text>
-                        </Tooltip>
-                    </Text>
+                    <div style={{flex: 'auto'}}>
+                        <Text style={{textAlign: "center", padding: '0 1em'}}>甲方：
+                            <Tooltip placement="bottom" title={<span>3705231998000021250</span>}>
+                                <Text strong>{partAName || <Icon type="loading" spin/>}</Text>
+                            </Tooltip>
+                        </Text>
                         <Text style={{textAlign: "center", padding: '0 1em'}}>乙方：
                             <Tooltip placement="bottom" title={<span>370523199800003355</span>}>
                                 <Text strong>{partBName || <Icon type="loading" spin/>}</Text>
                             </Tooltip>
-                        </Text></div>
+                        </Text>
+                    </div>
                 </Skeleton>
             </List.Item>
             {signCodeModalVisible && <Modal
