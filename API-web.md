@@ -167,6 +167,38 @@
   POST /contracts/{contractId}/decline
   ```
 
+* #### 获取签名授权码
+  ```
+  GET /contracts/{contractId}/signCode
+  ```
+  #### response
+  ```
+  {
+  "status":200,
+  "message":"success",
+  "data":"sdfsdf"//授权码
+  
+* #### 检测签名授权码状态
+  需要等待手机加密完成并上传，**该请求为websocket连接**
+  ```
+  GET /signCodeStatus?code=xyz
+  ```
+  ##### params
+  
+  |Name|Type|Description|
+  |---|---|---|
+  |code|string|要探测的签名授权码|
+  ##### 规则
+  * client不主动发送消息，只接受服务器消息
+  * 服务端设置过期时间（3分钟或其他），过期后手动关闭socket连接，此时客户端将视为过期
+  * 其他意外情况导致socket的关闭，客户端也可能视为过期
+  * 如果在有效期内二维码成功被验证，则服务端发送形如下的消息：
+    ```
+    "status":200,
+    "message":"success"
+    ```
+  * 成功验证授权码后，服务器最好**不要主动关闭**socket连接，而是等客户端关闭
+
   
 ### 日志(log)
 

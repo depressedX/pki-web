@@ -34,7 +34,7 @@ function Test(props) {
 storiesOf('Test', module)
     .add('with text', () => <Test propA={23}/>)
 
-storiesOf('Home', module)
+storiesOf('首页', module)
     .add('with text', () => <Home/>)
 
 storiesOf('登录日志', module)

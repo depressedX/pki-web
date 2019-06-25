@@ -1,13 +1,14 @@
 import React from "react";
 import {contract} from "../../../../API";
 import {fileType, getExtension} from "../../../../util";
-import {Avatar, Button, Icon, List, Popconfirm, Tooltip, message, Skeleton} from "antd";
+import {Avatar, Button, Icon, List, Popconfirm, Tooltip, message, Skeleton, Modal} from "antd";
 import {usePrevious, useUserInfo} from "../../../../customHooks";
 import Upload from "antd/lib/upload";
 import Text from "antd/lib/typography/Text";
 import Types from "prop-types";
 import './ContractItem.scss'
 import formatDate from 'dateformat'
+import {AuthBox} from "../PKIAuth/AuthBox";
 
 
 function genFileIcon(filename) {
@@ -26,7 +27,7 @@ function genFileIcon(filename) {
 
 }
 
-function AcceptButton({contrastId,onRefresh}) {
+function AcceptButton({contrastId, onRefresh}) {
     const [loading, setLoading] = React.useState(false)
 
     async function clickFunc() {
@@ -133,7 +134,7 @@ export function ContractItem(props) {
     let {type, id, title, lastModified, file: {filename, size, link}, partA, partB} = props
     const {onRemove} = props
 
-    const [loading,setLoading] = React.useState(false)
+    const [loading, setLoading] = React.useState(false)
 
     async function onRefresh() {
         setLoading(true)
@@ -143,7 +144,7 @@ export function ContractItem(props) {
 
         } catch (e) {
             message.error(`获取失败，code${e.status}:${e.message}`)
-        }finally {
+        } finally {
             setLoading(false)
         }
     }
@@ -161,7 +162,7 @@ export function ContractItem(props) {
     // 修改合同
     const modifyButton = <ModifyButton contrastId={id} onRefresh={onRefresh}/>
     // 签名
-    const signButton = <Button type={"primary"}>签名</Button>
+    const signButton = <Button type={"primary"} onClick={() => setSignCodeModalVisible(true)}>签名</Button>
     // 等待对方签名
     const othersSgnButton = <Button type={"primary"} disabled>等待对方签名</Button>
     // 下载证书
@@ -201,27 +202,46 @@ export function ContractItem(props) {
 
     const lastModifiedFormatted = formatDate(new Date(lastModified), 'yyyy mm-dd-HH:MM')
 
+    const [signCodeModalVisible, setSignCodeModalVisible] = React.useState(false)
+
+    function onFinishSigning(){
+        setSignCodeModalVisible(false)
+        onRefresh()
+    }
+
     return (
-        <List.Item actions={actionButtons} className={"contractItem"}>
-            <Skeleton avatar={{size:32}} title={false} paragraph={{width:[120,240]}} loading={loading} active>
-                <List.Item.Meta
-                    avatar={ItemIcon}
-                    title={<a href={link}
-                              target={'_blank'}>{type === itemStatus.STATUS_ALL_SIGNED && '(已成功签订)'}{title}</a>}
-                    description={`${filename} | ${size}KB | 最后修改：${lastModifiedFormatted}`}
-                />
-                <Text style={{flex: "none", textAlign: "center", padding: '0 1em'}}>甲方：
-                    <Tooltip placement="bottom" title={<span>3705231998000021250</span>}>
-                        <Text strong>{partAName || <Icon type="loading" spin/>}</Text>
-                    </Tooltip>
-                </Text>
-                <Text style={{flex: "none", textAlign: "center", padding: '0 1em'}}>乙方：
-                    <Tooltip placement="bottom" title={<span>370523199800003355</span>}>
-                        <Text strong>{partBName || <Icon type="loading" spin/>}</Text>
-                    </Tooltip>
-                </Text>
-            </Skeleton>
-        </List.Item>)
+        <>
+            <List.Item actions={actionButtons} className={"contractItem"}>
+                <Skeleton avatar={{size: 32}} title={false} paragraph={{width: [120, 290]}} loading={loading} active>
+                    <List.Item.Meta
+                        avatar={ItemIcon}
+                        title={<a href={link}
+                                  target={'_blank'}>{type === itemStatus.STATUS_ALL_SIGNED && '(已成功签订)'}{title}</a>}
+                        description={`${filename} | ${size}KB | 最后修改：${lastModifiedFormatted}`}
+                    />
+                    <div style={{flex:'auto'}}><Text style={{textAlign: "center", padding: '0 1em'}}>甲方：
+                        <Tooltip placement="bottom" title={<span>3705231998000021250</span>}>
+                            <Text strong>{partAName || <Icon type="loading" spin/>}</Text>
+                        </Tooltip>
+                    </Text>
+                        <Text style={{textAlign: "center", padding: '0 1em'}}>乙方：
+                            <Tooltip placement="bottom" title={<span>370523199800003355</span>}>
+                                <Text strong>{partBName || <Icon type="loading" spin/>}</Text>
+                            </Tooltip>
+                        </Text></div>
+                </Skeleton>
+            </List.Item>
+            {signCodeModalVisible && <Modal
+                width={360}
+                visible={true}
+                title="请使用手机密钥完成签名"
+                onCancel={() => setSignCodeModalVisible(false)}
+                footer={null}
+            >
+                <AuthBox onAuthOK={onFinishSigning}/>
+            </Modal>}
+        </>
+    )
 }
 
 ContractItem.status = itemStatus

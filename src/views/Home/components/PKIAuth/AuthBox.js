@@ -2,12 +2,10 @@ import React from 'react'
 import style from './AuthBox.module.scss'
 import Spin from "antd/lib/spin";
 import Icon from "antd/lib/icon";
-import {authorization, WS_AUTH_URL} from "../../../../API";
+import {authorization, contract, WS_AUTH_URL, WS_CONTRACT_SIGN_URL} from "../../../../API";
 import {useQRCode} from "../../../../customHooks";
 
-// 从服务器获取认证码并通过websocket监控其状态
-// 结果是认证信息
-export function useAuthorizationCode() {
+function useAuthorizationCode() {
 
     const FETCH = 'fetch',
         FINISH_FETCHING = 'finishFetching',
@@ -63,14 +61,10 @@ export function useAuthorizationCode() {
     const [code, setCode] = React.useState(null)
 
 
-    // 每次update组件都会重新生成一个闭包，所以这里timeoutId是全新的
-    // 即使这次更新可能会调用refresh方法，那也没关系，因为一个时刻只会有一个timeoutFunc
-    let expiredTimeoutFuncId = null
-
     function refresh() {
         dispatch({type: 'fetch'})
 
-        authorization.getAuthorizationCode()
+        contract.getSignCode()
             .then(async code => {
 
                 // 修改状态
@@ -78,33 +72,31 @@ export function useAuthorizationCode() {
                 setCode(code)
 
                 // TODO:建立websocket通道查找状态
-                let socket = new WebSocket(`${WS_AUTH_URL}?code=${code}`)
+                let socket = new WebSocket(`${WS_CONTRACT_SIGN_URL}?code=${code}`)
 
-                socket.onopen = function()
-                {
+                socket.onopen = function () {
                     console.log('通道已连接')
                 }
 
-                socket.onmessage = function (evt)
-                {
+                socket.onmessage = function (evt) {
                     let msg = evt.data
                     alert(`收到数据: ${msg}`)
                     dispatch({type: 'resolve'})
                     setAuthInfo('auth_OK')
-                    clearTimeout(expiredTimeoutFuncId)
                     socket.close()
                 }
 
-                socket.onclose = function()
-                {
-                    console.log("连接已关闭...");
+                socket.onclose = function (e) {
+                    if (e.code === 1) {
+                        console.log('连接已关闭，原因：授权成功')
+                    } else {
+                        console.log('连接已关闭，原因：超时或其他意外')
+                        dispatch({type: 'expireIt'})
+                    }
                 }
 
-                // 设置自然过期
-                clearTimeout(expiredTimeoutFuncId)
-                expiredTimeoutFuncId = setTimeout(() => {
-                    dispatch({type: 'expireIt'})
-                }, 2000)
+            }, e => {
+                dispatch({type: 'finishFetching'})
             })
     }
 
@@ -112,16 +104,13 @@ export function useAuthorizationCode() {
 
         refresh()
 
-        return () => {
-            clearTimeout(expiredTimeoutFuncId)
-        }
-
     }, [])
 
 
     return [code, curCodeState, refresh, authInfo]
 }
 
+// 用于对合同进行签名
 export function AuthBox({onAuthOK}) {
 
     const [code, curCodeState, refresh, authInfo] = useAuthorizationCode()
@@ -132,32 +121,25 @@ export function AuthBox({onAuthOK}) {
         if (!authInfo) return
         onAuthOK(authInfo)
 
-    }, [authInfo])
+    }, [authInfo, onAuthOK])
 
     return (
         <div className={style.authBox}>
-            <div className={style.qrCodeContainer}>
-                {/*加载中图标*/}
-                {(curCodeState.loading || curCodeState.null) &&
-                <Spin className={style.qrCodeLoading}
-                      indicator={<Icon type="loading" style={{fontSize: 36}} spin/>}/>}
-                {/*二维码*/}
-                {((curCodeState.pending || curCodeState.expired) && codeSrc) &&
-                <img className={style.qrCode} src={codeSrc} alt={'二维码,若未能显示，联系管理员'}/>}
-                {/*过期状态*/}
-                {curCodeState.expired &&
-                <div className={style.refreshIconMask}>
-                    <Icon onClick={refresh} className={style.refreshIcon} type="redo"
-                          style={{fontSize: 36, color: '#1890ff'}}/>
-                </div>
-                }
+            {/*加载中图标*/}
+            {(curCodeState.loading || curCodeState.null) &&
+            <Spin className={style.qrCodeLoading}
+                  indicator={<Icon type="loading" style={{fontSize: 36}} spin/>}/>}
+            {/*二维码*/}
+            {((curCodeState.pending || curCodeState.expired) && codeSrc) &&
+            <img className={style.qrCode} src={codeSrc} alt={'二维码,若未能显示，联系管理员'}/>}
+            {/*过期状态*/}
+            {curCodeState.expired &&
+            <div className={style.refreshIconMask}>
+                <Icon onClick={refresh} className={style.refreshIcon} type="redo"
+                      style={{fontSize: 36, color: '#1890ff'}}/>
+                      <p className={style.refreshTips}>二维码失效，点击刷新</p>
             </div>
-            <div className={style.authHint}>
-                {!curCodeState.expired && <>
-                    <p className={style.subTitle}>使用手机APP扫码验证</p>
-                </>}
-                {curCodeState.expired && <p className={style.refreshTips}>二维码失效，点击刷新</p>}
-            </div>
+            }
         </div>
     )
 }

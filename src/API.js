@@ -2,6 +2,7 @@ import axios from 'axios'
 import {ContractItem} from "./views/Home/components/Contract/ContractItem";
 
 export const WS_AUTH_URL = 'ws://192.168.137.1:8082/hi/auth'
+export const WS_CONTRACT_SIGN_URL = 'ws://192.168.137.1:8082/hi/signCodeStatus'
 const http = axios.create({
     baseURL: '/hi/',
     timeout: 2000
@@ -160,7 +161,20 @@ export const contract = {
             setTimeout(() => resolve(), 1000)
         })
         return true
-    }
+    },
+
+
+    // 获取签名授权码
+    async getSignCode() {
+
+        await new Promise(resolve => {
+            setTimeout(() => resolve(), 1000)
+        })
+
+        // return http.get('auth_code')
+        return Math.floor(Math.random()*1000000)
+
+    },
 
 
 }
