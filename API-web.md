@@ -107,7 +107,11 @@
           link: 'http://downloadfile.orz/test.pdf',
           size: 128//文件大小，单位KB
       },
-      lastModified: 11123155213//合同文件最后修改时间，时间戳
+      lastModified: 11123155213//合同文件最后修改时间，时间戳,
+      partAName:'张全蛋'，
+      partAIDCard:'32423424',
+      partBName:'李华'，
+      partBIDCard:'32423424'
     },
     ......
   ]
@@ -131,12 +135,16 @@
         link: 'http://downloadfile.orz/test.pdf',
         size: 128//文件大小，单位KB
     },
-    lastModified: 11123155213//合同文件最后修改时间，时间戳
+    lastModified: 11123155213//合同文件最后修改时间，时间戳,
+    partAName:'张全蛋'，
+    partAIDCard:'32423424',
+    partBName:'李华'，
+    partBIDCard:'32423424'
   }
   ```
 * #### 创建合同
   ```
-  POST /contracts/{contractId}/create
+  POST /contracts/create
   ```
   ##### input
   |Name|Type|Description|
@@ -159,12 +167,12 @@
 
 * #### 同意合同内容
   ```
-  POST /contracts/{contractId}/accept
+  GET /contracts/{contractId}/accept
   ```
 
 * #### 拒绝合同内容
   ```
-  POST /contracts/{contractId}/decline
+  GET /contracts/{contractId}/decline
   ```
 
 * #### 获取签名授权码
