@@ -167,12 +167,12 @@
 
 * #### 同意合同内容
   ```
-  GET /contracts/{contractId}/accept
+  POST /contracts/{contractId}/accept
   ```
 
 * #### 拒绝合同内容
   ```
-  GET /contracts/{contractId}/decline
+  POST /contracts/{contractId}/decline
   ```
 
 * #### 获取签名授权码
