@@ -48,7 +48,7 @@ function ModifyButton({contrastId, onRefresh}) {
     const [uploading, setUploading] = React.useState(false)
     const props = {
         name: 'file',
-        action: `https://www.mocky.io/v2/5cc8019d300000980a055e76?id=${contrastId}`,
+        action: `http://${window.location.host}/contracts/${contrastId}/update`,
         headers: {
             authorization: 'authorization-text',
         },
@@ -119,6 +119,7 @@ function DeclineButton({contrastId, onDecline}) {
 const itemStatus = {
 // 待确认
     STATUS_TO_BE_CONFIRMED: 1,
+    STATUS_TO_BE_CONFIRMED0: 0,
 // 有修改且待对方确认
     STATUS_OTHER_TO_BE_CONFIRMED: 2,
 // 已确认且对方也已确认
@@ -131,7 +132,7 @@ const itemStatus = {
 
 export function ContractItem(props) {
 
-    let {type, id, title, lastModified, file: {filename, size, link}, partA, partB} = props
+    let {type, id, title, lastModified, file: {filename, size, link}, partAName, partBName, partAIDCard, partBIDCard} = props
     const {onRemove} = props
 
     const [loading, setLoading] = React.useState(false)
@@ -139,7 +140,18 @@ export function ContractItem(props) {
     async function onRefresh() {
         setLoading(true)
         try {
-            ({type, id, title, lastModified, file: {filename, size, link}, partA, partB} =
+            ({
+                type,
+                id,
+                title,
+                lastModified,
+                data: {filename, size, link},
+                // file: {filename, size, link},
+                partAName,
+                partBName,
+                partAIDCard,
+                partBIDCard
+            } =
                 await contract.getById(id))
 
         } catch (e) {
@@ -149,8 +161,6 @@ export function ContractItem(props) {
         }
     }
 
-    const {username: partAName} = useUserInfo(partA)
-    const {username: partBName} = useUserInfo(partB)
     // 下载原合同按钮
     const downloadButton = <Button href={link} type={"link"}>下载</Button>
     // 接受合同
@@ -221,12 +231,12 @@ export function ContractItem(props) {
                     />
                     <div style={{flex: 'auto'}}>
                         <Text style={{textAlign: "center", padding: '0 1em'}}>甲方：
-                            <Tooltip placement="bottom" title={<span>3705231998000021250</span>}>
+                            <Tooltip placement="bottom" title={<span>{partAIDCard}</span>}>
                                 <Text strong>{partAName || <Icon type="loading" spin/>}</Text>
                             </Tooltip>
                         </Text>
                         <Text style={{textAlign: "center", padding: '0 1em'}}>乙方：
-                            <Tooltip placement="bottom" title={<span>370523199800003355</span>}>
+                            <Tooltip placement="bottom" title={<span>{partBIDCard}</span>}>
                                 <Text strong>{partBName || <Icon type="loading" spin/>}</Text>
                             </Tooltip>
                         </Text>

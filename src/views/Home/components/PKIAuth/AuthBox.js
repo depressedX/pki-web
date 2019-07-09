@@ -64,7 +64,7 @@ function useAuthorizationCode() {
     function refresh() {
         dispatch({type: 'fetch'})
 
-        contract.getSignCode()
+        contract.getSignCode(code)
             .then(async code => {
 
                 // 修改状态

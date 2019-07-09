@@ -76,13 +76,13 @@ export function useAuthorizationCode() {
 
         authorization.getAuthorizationCode()
             .then(async code => {
-
+console.log(code)
                 // 修改状态
                 dispatch({type: 'finishFetching'})
                 setCode(code)
 
                 // TODO:建立websocket通道查找状态
-                let socket = new WebSocket(`${WS_AUTH_URL}?code=${code}`)
+                let socket = new WebSocket(`${WS_AUTH_URL}${code}`)
 
                 socket.onopen = function()
                 {
@@ -104,11 +104,11 @@ export function useAuthorizationCode() {
                     console.log("连接已关闭...");
                 }
 
-                // 设置自然过期
+                // 设置自然过期 2分钟
                 clearTimeout(expiredTimeoutFuncId)
                 expiredTimeoutFuncId = setTimeout(() => {
                     dispatch({type: 'expireIt'})
-                }, 2000)
+                }, 1000*60*2)
             })
     }
 

@@ -43,7 +43,6 @@ export function ContractBox({contractListHook}) {
                 </Empty> :
                 <List
                     loadMore={loadMore}
-                    className="demo-loadmore-list"
                     loading={loading}
                     itemLayout="horizontal"
                     dataSource={list}
