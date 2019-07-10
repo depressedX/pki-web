@@ -8,11 +8,5 @@ module.exports = function (app) {
         }
     })
     app.use('/api',apiProxy);
-    app.use('/hi',proxy('/hi', {
-        target: 'http://47.95.214.69:1002',
-        onProxyReq:function onProxyReq(proxyReq, req, res) {
-            console.log(`proxy ${proxyReq.url} ${req.url}`)
-        }
-    }));
 
 };

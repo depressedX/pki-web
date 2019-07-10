@@ -5,7 +5,7 @@ import Icon from "antd/lib/icon";
 import {authorization, contract, WS_AUTH_URL, WS_CONTRACT_SIGN_URL} from "../../../../API";
 import {useQRCode} from "../../../../customHooks";
 
-function useAuthorizationCode() {
+function useAuthorizationCode(id) {
 
     const FETCH = 'fetch',
         FINISH_FETCHING = 'finishFetching',
@@ -64,7 +64,7 @@ function useAuthorizationCode() {
     function refresh() {
         dispatch({type: 'fetch'})
 
-        contract.getSignCode(code)
+        contract.getSignCode(id)
             .then(async code => {
 
                 // 修改状态
@@ -111,9 +111,9 @@ function useAuthorizationCode() {
 }
 
 // 用于对合同进行签名
-export function AuthBox({onAuthOK}) {
+export function AuthBox({onAuthOK,contractId}) {
 
-    const [code, curCodeState, refresh, authInfo] = useAuthorizationCode()
+    const [code, curCodeState, refresh, authInfo] = useAuthorizationCode(contractId)
     const codeSrc = useQRCode(code)
 
     // 检测auth信息

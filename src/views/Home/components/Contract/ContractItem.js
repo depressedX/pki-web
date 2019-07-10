@@ -1,5 +1,5 @@
 import React from "react";
-import {contract} from "../../../../API";
+import {contract, token} from "../../../../API";
 import {fileType, getExtension} from "../../../../util";
 import {Avatar, Button, Icon, List, Popconfirm, Tooltip, message, Skeleton, Modal} from "antd";
 import {usePrevious, useUserInfo} from "../../../../customHooks";
@@ -48,7 +48,7 @@ function ModifyButton({contrastId, onRefresh}) {
     const [uploading, setUploading] = React.useState(false)
     const props = {
         name: 'file',
-        action: `http://${window.location.host}/contracts/${contrastId}/update`,
+        action: `http://${window.location.host}/api/contracts/${contrastId}/update?token=${token}`,
         headers: {
             authorization: 'authorization-text',
         },
@@ -119,7 +119,6 @@ function DeclineButton({contrastId, onDecline}) {
 const itemStatus = {
 // 待确认
     STATUS_TO_BE_CONFIRMED: 1,
-    STATUS_TO_BE_CONFIRMED0: 0,
 // 有修改且待对方确认
     STATUS_OTHER_TO_BE_CONFIRMED: 2,
 // 已确认且对方也已确认
@@ -132,7 +131,9 @@ const itemStatus = {
 
 export function ContractItem(props) {
 
-    let {type, id, title, lastModified, file: {filename, size, link}, partAName, partBName, partAIDCard, partBIDCard} = props
+    const [info,setInfo] = React.useState(props)
+
+    let {type, id, title, lastModified, file: {filename, size, link}, partAName, partBName, partAIDCard, partBIDCard} = info
     const {onRemove} = props
 
     const [loading, setLoading] = React.useState(false)
@@ -140,19 +141,7 @@ export function ContractItem(props) {
     async function onRefresh() {
         setLoading(true)
         try {
-            ({
-                type,
-                id,
-                title,
-                lastModified,
-                data: {filename, size, link},
-                // file: {filename, size, link},
-                partAName,
-                partBName,
-                partAIDCard,
-                partBIDCard
-            } =
-                await contract.getById(id))
+                setInfo(await contract.getById(id))
 
         } catch (e) {
             message.error(`获取失败，code${e.status}:${e.message}`)
@@ -162,7 +151,7 @@ export function ContractItem(props) {
     }
 
     // 下载原合同按钮
-    const downloadButton = <Button href={link} type={"link"}>下载</Button>
+    const downloadButton = <Button href={'http://'+link} type={"link"}>下载</Button>
     // 接受合同
     const acceptButton = <AcceptButton contrastId={id} onRefresh={onRefresh}/>
     // 等待对方确认
@@ -205,7 +194,6 @@ export function ContractItem(props) {
     }
 
     let actionButtons = mapItemStatusToActionButtons(type)
-
 
     let ItemIcon = type === itemStatus.STATUS_ALL_SIGNED ?
         <Avatar icon={"check"} style={{color: '#f6ffed', backgroundColor: '#52c41a'}}/> : genFileIcon(filename)
@@ -250,7 +238,7 @@ export function ContractItem(props) {
                 onCancel={() => setSignCodeModalVisible(false)}
                 footer={null}
             >
-                <AuthBox onAuthOK={onFinishSigning}/>
+                <AuthBox onAuthOK={onFinishSigning} contractId={id}/>
             </Modal>}
         </>
     )

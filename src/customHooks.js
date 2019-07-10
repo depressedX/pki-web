@@ -42,11 +42,6 @@ export function useQRCode(text) {
 
 
 export function useContractList() {
-    const contractReducer = contract => {
-        contract.file = contract.data
-        delete contract.data
-        return contract
-    }
     const [list, setList] = React.useState([])
     const [loading, setLoading] = React.useState(false)
     React.useEffect(() => {
@@ -60,7 +55,7 @@ export function useContractList() {
         setLoading(true)
         try {
             const data = await contract.getList()
-            setList(data.map(contractReducer))
+            setList(data)
         } finally {
             setLoading(false)
         }

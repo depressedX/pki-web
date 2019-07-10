@@ -12,7 +12,7 @@ const ContractCreateFrom = Form.create({name: 'form_in_modal'})(
         }
 
         render() {
-            const {form} = this.props
+            const {form,onSelectFile} = this.props
             const {getFieldDecorator} = form;
             return (
                 <Form layout="vertical" hideRequiredMark>
@@ -36,8 +36,12 @@ const ContractCreateFrom = Form.create({name: 'form_in_modal'})(
                     </Form.Item>
                     <Form.Item label="合同文件">
                         <Upload name={'file'}
-                                action={'https://www.mocky.io/v2/5cc8019d300000980a055e76'}
-                                multiple={false}>
+                                multiple={false}
+                                beforeUpload={ file => {
+                                    onSelectFile(file)
+                                    return false;}
+                                }
+                                >
                             <Button>
                                 <Icon type="upload"/>点击上传
                             </Button>
@@ -57,6 +61,8 @@ export function NewContractDrawer({onClose, visible, onCreate}) {
 
     const [submitting, setSubmitting] = React.useState(false)
 
+    const [file,setFile] = React.useState(null)
+
     function handleCreate() {
         const {form} = formRef.current.props;
         form.validateFields(async (err, values) => {
@@ -72,6 +78,8 @@ export function NewContractDrawer({onClose, visible, onCreate}) {
                 Object.keys(values).forEach(key => {
                     formData.append(key, values[key])
                 })
+                formData.append('file',file)
+                console.log(formData)
                 await contract.create(formData)
                 form.resetFields();
                 message.success('创建成功')
@@ -91,7 +99,7 @@ export function NewContractDrawer({onClose, visible, onCreate}) {
             visible={visible}
         >
             <ContractCreateFrom
-                wrappedComponentRef={saveFormRef}/>
+                wrappedComponentRef={saveFormRef} onSelectFile={file=>setFile(file)}/>
             <Row>
                 <Col span={12}>
                     <Button type={'danger'} onClick={onClose}>取消</Button>

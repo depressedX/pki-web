@@ -1,18 +1,12 @@
 import axios from 'axios'
 import {ContractItem} from "./views/Home/components/Contract/ContractItem";
 
-export const WS_AUTH_URL = `ws://47.95.214.69:1002/auth_code_status/`
+export const WS_AUTH_URL = `ws://47.95.214.69:1002/auth/codeStatus`
 export const WS_CONTRACT_SIGN_URL = 'ws://47.95.214.69:1002/api/signCodeStatus'
 const http = axios.create({
     baseURL: '/api',
     timeout: 5000
 })
-// todo 一会删  后台没改前缀
-const anotherHttp = axios.create({
-    baseURL: '/hi',
-    timeout: 5000
-})
-
 http.interceptors.request.use(config => {
     if (!token) return config
     config.params = config.params || {}
@@ -34,160 +28,55 @@ http.interceptors.response.use(function (response) {
     // 对响应错误做点什么
     return Promise.reject(error);
 });
-anotherHttp.interceptors.request.use(config => {
-    if (!token) return config
-    config.params = config.params || {}
-    config.params.token = token
-    return config
-})
-// 添加响应拦截器
-anotherHttp.interceptors.response.use(function (response) {
 
-    let body = response.data
-    if (body.status === 200) {
-        return body.data
-    } else {
-        let e = new Error(body.message)
-        e.status = body.status
-        return Promise.reject(e)
-    }
-}, function (error) {
-    // 对响应错误做点什么
-    return Promise.reject(error);
-});
-
-const token = 'eyJ0eXBlIjoiIiwiYWxnIjoiSFM1MTIifQ.eyJpZCI6IjEwMDA1IiwidGltZVN0YW1wIjoxNTYyNjYxOTExMTU5LCJ0aW1lT3V0IjoxNTYyNzQ4MzExMTU5fQ.RIburQTRtDW9UNJ5qusNJrzui-um96fsrS496vbdzAKGdpacFNWSqdAi3QgOmB0p1YK3FeYQzGTugo2HxA0dwg'
+// export let token = null
+export let token = 'eyJ0eXBlIjoiIiwiYWxnIjoiSFM1MTIifQ.eyJpZCI6IjEwMDAwIiwidGltZVN0YW1wIjoxNTYyNzU4NTM4NTkwLCJ0aW1lT3V0IjoxNTYyODQ0OTM4NTkwfQ.Xa4wgATA9UajD7nmmtgmMTk6ZlaW-4KhEfm1zbwm3lsNlNsjcrNcQbZTe8Vcr93pq-hQBEV_thDCqTXFQrGOSw'
+if (window.location.search==='?another'){
+    token='eyJ0eXBlIjoiIiwiYWxnIjoiSFM1MTIifQ.eyJpZCI6IjEwMDAxIiwidGltZVN0YW1wIjoxNTYyNzU4NjI1MzcyLCJ0aW1lT3V0IjoxNTYyODQ1MDI1MzcyfQ.4m0_jGXvhWMyeDoXGyWcODYTnmmG9nnavibIVZ56-Rbbny5zMNpjDHcpY9YQzTi9JOXNcz65eBtLfi3dbl3HHA'
+}
+export const setToken = v=>{token=v}
 
 export const authorization = {
     async getAuthorizationCode() {
 
-        return (await anotherHttp.get('auth_code')).str
+        return (await http.get('auth/code'))
 
     }
 }
 
+const contractReducer = contract => {
+    contract.file = contract.data
+    if (contract.type === 0) contract.type = 1
+    delete contract.data
+    return contract
+}
 export const contract = {
     async getList() {
-        await new Promise(resolve => {
-            setTimeout(() => resolve(), 1000)
-        })
-
-        return http.get('contracts')
-        return [
-            {
-                type: ContractItem.status.STATUS_TO_BE_CONFIRMED,
-                loading: false,
-                title: '二手房买卖合同2018',
-                file: {
-                    filename: 'test.pdf',
-                    link: process.env.PUBLIC_URL + '/test.pdf',
-                    size: 128
-                },
-                lastModified: Date.now()
-            },
-            {
-                type: ContractItem.status.STATUS_OTHER_TO_BE_CONFIRMED,
-                loading: false,
-                title: '二手房买卖合同2018',
-                file: {
-                    filename: 'test.txt',
-                    link: process.env.PUBLIC_URL + '/test.pdf',
-                    size: 128
-                },
-                lastModified: Date.now()
-            },
-            {
-                type: ContractItem.status.STATUS_ALL_CONFIRMED,
-                loading: false,
-                title: '二手房买卖合同2018',
-                file: {
-                    filename: 'test.pdf',
-                    link: process.env.PUBLIC_URL + '/test.pdf',
-                    size: 128
-                },
-                lastModified: Date.now()
-            },
-            {
-                type: ContractItem.status.STATUS_OTHER_TO_BE_SIGNED,
-                loading: false,
-                title: '二手房买卖合同2018',
-                file: {
-                    filename: 'test.doc',
-                    link: process.env.PUBLIC_URL + '/test.pdf',
-                    size: 128
-                },
-                lastModified: Date.now()
-            },
-            {
-                type: ContractItem.status.STATUS_ALL_SIGNED,
-                loading: false,
-                title: '二手房买卖合同2018',
-                file: {
-                    filename: 'test.pdf',
-                    link: process.env.PUBLIC_URL + '/test.pdf',
-                    size: 128
-                },
-                lastModified: Date.now()
-            },
-        ]
+        return http.get('contracts').then(data=>data.map(contractReducer))
     },
 
     async getById(contractId) {
 
-        return http.get(`contracts/${contractId}`)
+        return http.get(`contracts/${contractId}`).then(data=>contractReducer(data))
 
-        await new Promise(resolve => {
-            setTimeout(() => resolve(), 1000)
-        })
-
-        return {
-            type: ContractItem.status.STATUS_TO_BE_CONFIRMED,
-            title: '二手房买卖合同2018',
-            file: {
-                filename: 'test.pdf',
-                link: process.env.PUBLIC_URL + '/test.pdf',
-                size: 128
-            },
-            lastModified: Date.now()
-        }
     },
 
     async accept(id) {
         return http.post(`contracts/${id}/accept`)
-        await new Promise(resolve => {
-            setTimeout(() => resolve(), 1000)
-        })
-        return true
     },
     async create(form) {
         return http.post(`contracts/create`,form)
-        await new Promise(resolve => {
-            setTimeout(() => resolve(), 1000)
-        })
-        return true
     },
 
 
     async decline(id) {
         return http.post(`contracts/${id}/decline`)
-        await new Promise(resolve => {
-            setTimeout(() => resolve(), 1000)
-        })
-        return true
     },
 
 
     // 获取签名授权码
     async getSignCode(id) {
-        return http.post(`contracts/${id}/signCode`)
-
-        await new Promise(resolve => {
-            setTimeout(() => resolve(), 1000)
-        })
-
-        // return http.get('auth_code')
-        return Math.floor(Math.random()*1000000)
-
+        return http.get(`contracts/${id}/signCode`)
     },
 
 

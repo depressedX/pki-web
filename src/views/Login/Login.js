@@ -3,7 +3,7 @@ import QRCode from 'qrcode'
 import style from './Login.module.scss'
 import Spin from "antd/lib/spin";
 import Icon from "antd/lib/icon";
-import {authorization, WS_AUTH_URL} from "../../API";
+import {authorization, setToken, WS_AUTH_URL} from "../../API";
 import {useRouter} from "../../CustomBrowserRouter";
 import {message} from 'antd'
 import {useQRCode} from "../../customHooks";
@@ -82,7 +82,7 @@ console.log(code)
                 setCode(code)
 
                 // TODO:建立websocket通道查找状态
-                let socket = new WebSocket(`${WS_AUTH_URL}${code}`)
+                let socket = new WebSocket(`${WS_AUTH_URL}?code=${code}`)
 
                 socket.onopen = function()
                 {
@@ -91,10 +91,10 @@ console.log(code)
 
                 socket.onmessage = function (evt)
                 {
-                    let msg = evt.data
-                    alert(`收到数据: ${msg}`)
+                    let msg = JSON.parse(evt.data)
+                    if (msg.status !== 200) return
                     dispatch({type: 'resolve'})
-                    setAuthInfo('auth_OK')
+                    setAuthInfo(msg.data)
                     clearTimeout(expiredTimeoutFuncId)
                     socket.close()
                 }
@@ -146,6 +146,7 @@ function LoginBox() {
     // 检测auth信息
     React.useEffect(() => {
         if (!authInfo) return
+        setToken(authInfo)
         message.success('登陆成功！正在跳转')
         setTimeout(() => {
 

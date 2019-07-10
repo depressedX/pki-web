@@ -9,6 +9,7 @@ import {LogBox} from "./components/Log/LogBox";
 import Card from "antd/lib/card";
 import {NewContractDrawer} from "./components/Contract/NewContractDrawer";
 import {useContractList} from "../../customHooks";
+import {token} from "../../API";
 
 export function Home() {
 
