@@ -1,6 +1,6 @@
 import React from "react";
 import {contract, getToken} from "../../../../API";
-import {fileType, getExtension} from "../../../../util";
+import {fileType, getExtension, splitExtension} from "../../../../util";
 import {Avatar, Button, Icon, List, Popconfirm, Tooltip, message, Skeleton, Modal} from "antd";
 import {usePrevious, useUserInfo} from "../../../../customHooks";
 import Upload from "antd/lib/upload";
@@ -165,7 +165,8 @@ export function ContractItem(props) {
     // 等待对方签名
     const othersSgnButton = <Button type={"primary"} disabled>等待对方签名</Button>
     // 下载证书
-    const downloadCredentialButton = <Button href={link} type={"link"}>下载签名版合同</Button>
+    const downloadCredentialAButton = <Button href={'http://'+splitExtension(link)+'.-AParty.txt'} type={"link"}>下载甲方签名文件</Button>
+    const downloadCredentialBButton = <Button href={'http://'+splitExtension(link)+'.-BParty.txt'} type={"link"}>下载乙方签名文件</Button>
     // 校验本地文件
     const verifyLocalCredential = <Button href={link} type={"link"}>校验本地文件</Button>
 
@@ -185,7 +186,7 @@ export function ContractItem(props) {
                 return [downloadButton, othersSgnButton]
             }
             case itemStatus.STATUS_ALL_SIGNED: {
-                return [downloadButton, downloadCredentialButton, verifyLocalCredential]
+                return [downloadButton, downloadCredentialAButton,downloadCredentialBButton]
             }
             default: {
                 throw new Error(`unknown item type:${type} ${JSON.stringify(itemStatus)}`)

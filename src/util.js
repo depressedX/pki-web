@@ -7,6 +7,15 @@ export const getExtension = filename => {
     }
 }
 
+export const splitExtension = filename=>{
+    let i = filename.lastIndexOf('.')
+    if (i === -1) {
+        return null
+    } else {
+        return filename.slice(0, i)
+    }
+}
+
 export const fileType = {
     isPdf: ext => ext === 'pdf',
     isImg: ext => /(jpg|bmp|gif|ico|pcx|jpeg|tif|png|raw|tga)$/.test(ext),
