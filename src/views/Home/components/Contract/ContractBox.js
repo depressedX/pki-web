@@ -10,18 +10,6 @@ export function ContractBox({contractListHook}) {
 
     const [list, loading, {refresh, removeOne}] = contractListHook
 
-    const loadMore = !loading ? (
-        <div
-            style={{
-                textAlign: 'center',
-                marginTop: 12,
-                height: 32,
-                lineHeight: '32px',
-            }}
-        >
-            <Button>loading more</Button>
-        </div>
-    ) : null
 
     const [showContractCreateDrawer,setShowContractCreateDrawer] =React.useState(false)
 
@@ -42,7 +30,6 @@ export function ContractBox({contractListHook}) {
                     <Button type="primary">点击创建新合同</Button>
                 </Empty> :
                 <List
-                    loadMore={loadMore}
                     loading={loading}
                     itemLayout="horizontal"
                     dataSource={list}

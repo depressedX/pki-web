@@ -79,8 +79,10 @@ function useAuthorizationCode(id) {
                 }
 
                 socket.onmessage = function (evt) {
-                    let msg = evt.data
-                    alert(`收到数据: ${msg}`)
+                    let msg = JSON.parse(evt.data)
+                    if (msg.status !== 200) {
+                        return
+                    }
                     dispatch({type: 'resolve'})
                     setAuthInfo('auth_OK')
                     socket.close()

@@ -36,7 +36,7 @@ export function Home() {
                 <Icon type="smile" theme="twoTone" style={{fontSize: '48px'}}/>
             </div>
             <Title style={{fontWeight:"normal"}}>欢迎回来：{'XXX'}</Title>
-            <Button type={"link"} onClick={() => setShowDeviceBox(true)}>设备信息</Button>
+            {/*<Button type={"link"} onClick={() => setShowDeviceBox(true)}>设备信息</Button>*/}
             <Button type={"link"} onClick={() => setShowLogBox(true)}>登录日志</Button>
             <Divider/>
             <Card title="合同" bordered={false}

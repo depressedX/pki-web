@@ -71,8 +71,8 @@ export function LogBox() {
                                             shape={"square"}/>
                                 }
                                 title={logItem.deviceModel}
-                                description={`${dateFormat(new Date(logItem.timestamp), 'mm-dd HH:MM')} 
-                                ${logItem.deviceId}`}
+                                description={`${logItem.time} 
+                                ${logItem.serial}`}
                             />
                         </Card>
                     </Timeline.Item>)}
