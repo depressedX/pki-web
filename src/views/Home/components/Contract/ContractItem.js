@@ -1,5 +1,5 @@
 import React from "react";
-import {contract, token} from "../../../../API";
+import {contract, getToken} from "../../../../API";
 import {fileType, getExtension} from "../../../../util";
 import {Avatar, Button, Icon, List, Popconfirm, Tooltip, message, Skeleton, Modal} from "antd";
 import {usePrevious, useUserInfo} from "../../../../customHooks";
@@ -48,7 +48,7 @@ function ModifyButton({contrastId, onRefresh}) {
     const [uploading, setUploading] = React.useState(false)
     const props = {
         name: 'file',
-        action: `http://${window.location.host}/api/contracts/${contrastId}/update?token=${token}`,
+        action: `http://${window.location.host}/api/contracts/${contrastId}/update?token=${getToken()}`,
         headers: {
             authorization: 'authorization-text',
         },

@@ -8,9 +8,9 @@ const http = axios.create({
     timeout: 5000
 })
 http.interceptors.request.use(config => {
-    if (!token) return config
+    if (!getToken()) return config
     config.params = config.params || {}
-    config.params.token = token
+    config.params.token = getToken()
     return config
 })
 // 添加响应拦截器
@@ -28,18 +28,20 @@ http.interceptors.response.use(function (response) {
     // 对响应错误做点什么
     return Promise.reject(error);
 });
-
-// export let token = null
-export let token = 'eyJ0eXBlIjoiIiwiYWxnIjoiSFM1MTIifQ.eyJpZCI6IjEwMDAwIiwidGltZVN0YW1wIjoxNTYyNzU4NTM4NTkwLCJ0aW1lT3V0IjoxNTYyODQ0OTM4NTkwfQ.Xa4wgATA9UajD7nmmtgmMTk6ZlaW-4KhEfm1zbwm3lsNlNsjcrNcQbZTe8Vcr93pq-hQBEV_thDCqTXFQrGOSw'
-if (window.location.search==='?another'){
-    token='eyJ0eXBlIjoiIiwiYWxnIjoiSFM1MTIifQ.eyJpZCI6IjEwMDAxIiwidGltZVN0YW1wIjoxNTYyNzU4NjI1MzcyLCJ0aW1lT3V0IjoxNTYyODQ1MDI1MzcyfQ.4m0_jGXvhWMyeDoXGyWcODYTnmmG9nnavibIVZ56-Rbbny5zMNpjDHcpY9YQzTi9JOXNcz65eBtLfi3dbl3HHA'
+export let getToken = ()=>sessionStorage.getItem('token')
+// export let token = 'eyJ0eXBlIjoiIiwiYWxnIjoiSFM1MTIifQ.eyJpZCI6IjEwMDAwIiwidGltZVN0YW1wIjoxNTYyNzU4NTM4NTkwLCJ0aW1lT3V0IjoxNTYyODQ0OTM4NTkwfQ.Xa4wgATA9UajD7nmmtgmMTk6ZlaW-4KhEfm1zbwm3lsNlNsjcrNcQbZTe8Vcr93pq-hQBEV_thDCqTXFQrGOSw'
+// if (window.location.search==='?another'){
+//     token='eyJ0eXBlIjoiIiwiYWxnIjoiSFM1MTIifQ.eyJpZCI6IjEwMDAxIiwidGltZVN0YW1wIjoxNTYyNzU4NjI1MzcyLCJ0aW1lT3V0IjoxNTYyODQ1MDI1MzcyfQ.4m0_jGXvhWMyeDoXGyWcODYTnmmG9nnavibIVZ56-Rbbny5zMNpjDHcpY9YQzTi9JOXNcz65eBtLfi3dbl3HHA'
+// }
+// export const setToken = v=>{token=v}
+export const setToken = v=>{
+    sessionStorage.setItem('token',v)
 }
-export const setToken = v=>{token=v}
 
 export const authorization = {
     async getAuthorizationCode() {
 
-        return (await http.get('auth/code'))
+        return await http.get('auth/code')
 
     }
 }
