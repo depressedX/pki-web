@@ -221,35 +221,10 @@
   "message":"success",
   "data":[
     {
-      deviceId: 'SDFSDXV-345',//设备唯一ID
-      deviceModel: 'iPhoneX',//设备型号
-      deviceType: 'mobile',//设别类型 'mobile' | 'desktop'
+      serial: 'SDFSDXV-345',//设备唯一ID
       timestamp:15656554//时间戳
     },
     ......
   ]
   }
-  ```
-  
-### 设备(device)
-
-* #### 获取该用户全部已授权设备
-  ```
-  GET /devices
-  ```
-  #### response
-  ```
-  {
-  "status":200,
-  "message":"success",
-  "data":{
-    deviceId: 'SDFSDXV-345',//设备唯一ID
-    deviceModel: 'iPhoneX',//设备型号
-    deviceType: 'mobile',//设别类型 'mobile' | 'desktop'
-  }
-  ```
-
-* #### 解除已授权设备
-  ```
-  POST /devices/{deviceId}/deauth
   ```
